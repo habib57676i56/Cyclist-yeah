@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="open_quran"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:shortcutShortLabel="@string/shortcut_quran_short"
+        android:shortcutLongLabel="@string/shortcut_quran_long">
+        <intent
+            android:action="com.aistudio.noor.SHORTCUT_OPEN_QURAN"
+            android:targetPackage="com.aistudio.noor.quranapp"
+            android:targetClass="com.example.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="continue_reading"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:shortcutShortLabel="@string/shortcut_continue_short"
+        android:shortcutLongLabel="@string/shortcut_continue_long">
+        <intent
+            android:action="com.aistudio.noor.SHORTCUT_CONTINUE_READING"
+            android:targetPackage="com.aistudio.noor.quranapp"
+            android:targetClass="com.example.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="start_memorization"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:shortcutShortLabel="@string/shortcut_memorize_short"
+        android:shortcutLongLabel="@string/shortcut_memorize_long">
+        <intent
+            android:action="com.aistudio.noor.SHORTCUT_MEMORIZATION"
+            android:targetPackage="com.aistudio.noor.quranapp"
+            android:targetClass="com.example.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="prayer_times"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_compass"
+        android:shortcutShortLabel="@string/shortcut_prayer_short"
+        android:shortcutLongLabel="@string/shortcut_prayer_long">
+        <intent
+            android:action="com.aistudio.noor.SHORTCUT_PRAYER_TIMES"
+            android:targetPackage="com.aistudio.noor.quranapp"
+            android:targetClass="com.example.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="quran_listening"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_lock_silent_mode_off"
+        android:shortcutShortLabel="@string/shortcut_listen_short"
+        android:shortcutLongLabel="@string/shortcut_listen_long">
+        <intent
+            android:action="com.aistudio.noor.SHORTCUT_LISTEN"
+            android:targetPackage="com.aistudio.noor.quranapp"
+            android:targetClass="com.example.MainActivity" />
+    </shortcut>
+</shortcuts>

@@ -1,0 +1,365 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user profile storing Google identity metadata and zero-trust role status.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID." },
+        "displayName": { "type": "string", "description": "Display name." },
+        "email": { "type": "string", "description": "Verified account email." },
+        "photoUrl": { "type": "string", "description": "Optional Google avatar URL." },
+        "role": { "type": "string", "enum": ["STUDENT", "TEACHER", "ADMIN", "SUPER_ADMIN"], "description": "Server-governed user role." },
+        "accountStatus": { "type": "string", "enum": ["ACTIVE", "SUSPENDED"], "description": "Account moderation status." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on create." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["userId", "displayName", "email", "role", "accountStatus", "createdAt", "updatedAt"]
+    },
+    "AdminGrant": {
+      "title": "AdminGrant",
+      "description": "Backend authorization document granting admin privileges to a UID.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "grantedBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "grantedBy", "createdAt"]
+    },
+    "UserPreferences": {
+      "title": "UserPreferences",
+      "description": "User language, theme, audio, and notification settings.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "language": { "type": "string", "enum": ["ar", "en", "uz"] },
+        "darkMode": { "type": "boolean" },
+        "autoScrollSpeed": { "type": "number" },
+        "selectedReciterId": { "type": "string" },
+        "playbackSpeed": { "type": "number" },
+        "prayerNotifications": { "type": "boolean" },
+        "quranReminders": { "type": "boolean" },
+        "revisionReminders": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "language", "darkMode", "autoScrollSpeed", "selectedReciterId", "playbackSpeed", "prayerNotifications", "quranReminders", "revisionReminders", "updatedAt"]
+    },
+    "UserProgress": {
+      "title": "UserProgress",
+      "description": "User reading position, daily goal, and cumulative memorization metrics.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "lastPage": { "type": "integer" },
+        "lastSurah": { "type": "integer" },
+        "lastAyah": { "type": "integer" },
+        "memorizedAyahsCount": { "type": "integer" },
+        "memorizedPagesCount": { "type": "integer" },
+        "dailyGoalPages": { "type": "integer" },
+        "dailyReadPages": { "type": "integer" },
+        "completedRevisions": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "lastPage", "lastSurah", "lastAyah", "memorizedAyahsCount", "memorizedPagesCount", "dailyGoalPages", "dailyReadPages", "completedRevisions", "updatedAt"]
+    },
+    "BookmarkRecord": {
+      "title": "BookmarkRecord",
+      "description": "Personal bookmark or favorite Surah/Ayah/Page with optional note.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "page": { "type": "integer" },
+        "surah": { "type": "integer" },
+        "ayah": { "type": "integer" },
+        "favorite": { "type": "boolean" },
+        "note": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "page", "surah", "ayah", "favorite", "createdAt", "updatedAt"]
+    },
+    "ReadingHistoryRecord": {
+      "title": "ReadingHistoryRecord",
+      "description": "Timestamped page reading log.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "page": { "type": "integer" },
+        "surah": { "type": "integer" },
+        "ayah": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "page", "surah", "ayah", "createdAt"]
+    },
+    "MemorizationSessionRecord": {
+      "title": "MemorizationSessionRecord",
+      "description": "Personal Quran memorization range session.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "surah": { "type": "integer" },
+        "startAyah": { "type": "integer" },
+        "endAyah": { "type": "integer" },
+        "status": { "type": "string", "enum": ["IN_PROGRESS", "MEMORIZED", "NEEDS_REVISION"] },
+        "memorized": { "type": "boolean" },
+        "accuracyPercent": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "surah", "startAyah", "endAyah", "status", "memorized", "accuracyPercent", "createdAt", "updatedAt"]
+    },
+    "RevisionScheduleRecord": {
+      "title": "RevisionScheduleRecord",
+      "description": "Spaced-repetition memorization revision schedule.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "surah": { "type": "integer" },
+        "startAyah": { "type": "integer" },
+        "endAyah": { "type": "integer" },
+        "nextDueDateIso": { "type": "string" },
+        "intervalDays": { "type": "integer" },
+        "completed": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "surah", "startAyah", "endAyah", "nextDueDateIso", "intervalDays", "completed", "createdAt", "updatedAt"]
+    },
+    "RecitationRecordingMeta": {
+      "title": "RecitationRecordingMeta",
+      "description": "Metadata for user recitation audio file stored locally.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "surah": { "type": "integer" },
+        "startAyah": { "type": "integer" },
+        "endAyah": { "type": "integer" },
+        "durationMs": { "type": "integer" },
+        "localFileName": { "type": "string" },
+        "speechMode": { "type": "string", "enum": ["OFFLINE", "ONLINE_DEVICE", "RECORDED_ONLY"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "surah", "startAyah", "endAyah", "durationMs", "localFileName", "speechMode", "createdAt"]
+    },
+    "RecitationAssessmentRecord": {
+      "title": "RecitationAssessmentRecord",
+      "description": "Structured recitation comparison result against verified Quran text.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "surah": { "type": "integer" },
+        "startAyah": { "type": "integer" },
+        "endAyah": { "type": "integer" },
+        "recognizedText": { "type": "string" },
+        "confidence": { "type": "number" },
+        "accuracyPercent": { "type": "integer" },
+        "omittedCount": { "type": "integer" },
+        "repeatedCount": { "type": "integer" },
+        "replacedCount": { "type": "integer" },
+        "assessmentStatus": { "type": "string", "enum": ["CONFIRMED", "LOW_CONFIDENCE_REVIEW", "UNPROCESSED"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "surah", "startAyah", "endAyah", "recognizedText", "confidence", "accuracyPercent", "omittedCount", "repeatedCount", "replacedCount", "assessmentStatus", "createdAt"]
+    },
+    "MemorizationTestResult": {
+      "title": "MemorizationTestResult",
+      "description": "Interactive Quran memorization quiz outcome.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "testType": { "type": "string", "enum": ["CONTINUE_AYAH", "MISSING_WORDS", "NEXT_AYAH", "IDENTIFY_SURAH", "CHOOSE_CONTINUATION", "RECITE_BLIND"] },
+        "surah": { "type": "integer" },
+        "startAyah": { "type": "integer" },
+        "endAyah": { "type": "integer" },
+        "scorePercent": { "type": "integer" },
+        "totalQuestions": { "type": "integer" },
+        "correctAnswers": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "testType", "surah", "startAyah", "endAyah", "scorePercent", "totalQuestions", "correctAnswers", "createdAt"]
+    },
+    "KhatmahSessionRecord": {
+      "title": "KhatmahSessionRecord",
+      "description": "Personal Quran Khatmah completion tracker.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "targetDays": { "type": "integer" },
+        "completedPages": { "type": "integer" },
+        "lastPage": { "type": "integer" },
+        "completed": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "targetDays", "completedPages", "lastPage", "completed", "createdAt", "updatedAt"]
+    },
+    "FastingRecord": {
+      "title": "FastingRecord",
+      "description": "Personal voluntary and obligatory fasting log.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "planType": { "type": "string", "enum": ["MON_THU", "WHITE_DAYS", "RAMADAN", "CUSTOM"] },
+        "completedDays": { "type": "integer" },
+        "targetDays": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "planType", "completedDays", "targetDays", "createdAt", "updatedAt"]
+    },
+    "UserNotificationRecord": {
+      "title": "UserNotificationRecord",
+      "description": "User notification history item with read tracking.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "category": { "type": "string", "enum": ["PRAYER", "QURAN", "MEMORIZATION", "REVISION", "SYSTEM"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "body", "category", "read", "createdAt"]
+    },
+    "AnnouncementRecord": {
+      "title": "AnnouncementRecord",
+      "description": "Admin-managed application-wide announcements.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "audience": { "type": "string", "enum": ["ALL", "STUDENTS", "MEMORIZERS"] },
+        "active": { "type": "boolean" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "message", "audience", "active", "createdBy", "createdAt", "updatedAt"]
+    },
+    "ApprovedKnowledgeSource": {
+      "title": "ApprovedKnowledgeSource",
+      "description": "Verified Islamic RAG knowledge base entry curated by admins.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "question": { "type": "string" },
+        "answer": { "type": "string" },
+        "keywords": { "type": "string" },
+        "reference": { "type": "string" },
+        "approvalStatus": { "type": "string", "enum": ["APPROVED", "PENDING", "REJECTED"] },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "category", "answer", "reference", "approvalStatus", "createdBy", "createdAt", "updatedAt"]
+    },
+    "AiFeedbackRecord": {
+      "title": "AiFeedbackRecord",
+      "description": "User feedback on NOOR AI answers and unanswered questions.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "question": { "type": "string" },
+        "aiResponse": { "type": "string" },
+        "helpful": { "type": "boolean" },
+        "unanswered": { "type": "boolean" },
+        "reviewed": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "question", "aiResponse", "helpful", "unanswered", "reviewed", "createdAt"]
+    },
+    "AdminAuditLog": {
+      "title": "AdminAuditLog",
+      "description": "Immutable admin action audit trail.",
+      "type": "object",
+      "properties": {
+        "actorUid": { "type": "string" },
+        "actorEmail": { "type": "string" },
+        "action": { "type": "string" },
+        "target": { "type": "string" },
+        "details": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["actorUid", "actorEmail", "action", "target", "details", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile isolated per authenticated UID"
+    },
+    "/admins/{adminUid}": {
+      "schema": { "$ref": "#/entities/AdminGrant" },
+      "description": "Backend-enforced admin authorization registry"
+    },
+    "/users/{userId}/user_preferences/{prefId}": {
+      "schema": { "$ref": "#/entities/UserPreferences" },
+      "description": "User preferences subcollection"
+    },
+    "/users/{userId}/user_progress/{progressId}": {
+      "schema": { "$ref": "#/entities/UserProgress" },
+      "description": "User reading and memorization progress"
+    },
+    "/users/{userId}/bookmarks/{bookmarkId}": {
+      "schema": { "$ref": "#/entities/BookmarkRecord" },
+      "description": "User bookmarks and favorites"
+    },
+    "/users/{userId}/reading_history/{historyId}": {
+      "schema": { "$ref": "#/entities/ReadingHistoryRecord" },
+      "description": "User Quran reading history"
+    },
+    "/users/{userId}/memorization_sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/MemorizationSessionRecord" },
+      "description": "User memorization sessions"
+    },
+    "/users/{userId}/revision_schedules/{scheduleId}": {
+      "schema": { "$ref": "#/entities/RevisionScheduleRecord" },
+      "description": "User memorization revision schedules"
+    },
+    "/users/{userId}/recitation_recordings_metadata/{recId}": {
+      "schema": { "$ref": "#/entities/RecitationRecordingMeta" },
+      "description": "User recitation audio recording metadata"
+    },
+    "/users/{userId}/recitation_assessments/{assessmentId}": {
+      "schema": { "$ref": "#/entities/RecitationAssessmentRecord" },
+      "description": "User recitation comparison assessments"
+    },
+    "/users/{userId}/test_results/{testId}": {
+      "schema": { "$ref": "#/entities/MemorizationTestResult" },
+      "description": "User Quran memorization quiz results"
+    },
+    "/users/{userId}/khatmah_sessions/{khatmahId}": {
+      "schema": { "$ref": "#/entities/KhatmahSessionRecord" },
+      "description": "User Khatmah sessions"
+    },
+    "/users/{userId}/fasting_records/{fastId}": {
+      "schema": { "$ref": "#/entities/FastingRecord" },
+      "description": "User fasting tracker logs"
+    },
+    "/users/{userId}/notifications/{notifId}": {
+      "schema": { "$ref": "#/entities/UserNotificationRecord" },
+      "description": "User personal notifications and read status"
+    },
+    "/announcements/{announcementId}": {
+      "schema": { "$ref": "#/entities/AnnouncementRecord" },
+      "description": "App announcements published by admins"
+    },
+    "/approved_knowledge_sources/{sourceId}": {
+      "schema": { "$ref": "#/entities/ApprovedKnowledgeSource" },
+      "description": "Verified Islamic knowledge sources for NOOR AI RAG"
+    },
+    "/ai_feedback/{feedbackId}": {
+      "schema": { "$ref": "#/entities/AiFeedbackRecord" },
+      "description": "AI answer feedback and unanswered question reports"
+    },
+    "/admin_audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AdminAuditLog" },
+      "description": "Immutable admin audit logs"
+    }
+  }
+}

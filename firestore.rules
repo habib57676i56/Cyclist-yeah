@@ -1,0 +1,564 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net (Default-Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core Security & Validation Primitives
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isValidId(id) { return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    function isBootstrapAdmin() {
+      return isSignedIn() &&
+             request.auth.token.email == 'habiybullohy@gmail.com' &&
+             request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isBootstrapAdmin() ||
+             (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidTimestamp(ts) {
+      return ts is timestamp && ts <= request.time;
+    }
+
+    // 1. User Profile Validation
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80 &&
+             data.email is string && data.email.size() >= 3 && data.email.size() <= 120 &&
+             (!('photoUrl' in data) || (data.photoUrl is string && data.photoUrl.size() <= 500)) &&
+             data.role in ['STUDENT', 'TEACHER', 'ADMIN', 'SUPER_ADMIN'] &&
+             data.accountStatus in ['ACTIVE', 'SUSPENDED'];
+    }
+
+    // 2. Admin Registry Validation
+    function isValidAdminGrant(data) {
+      return data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() >= 3 && data.email.size() <= 120 &&
+             data.grantedBy is string && data.grantedBy.size() >= 1 && data.grantedBy.size() <= 128;
+    }
+
+    // 3. Preferences Validation
+    function isValidUserPreferences(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.language in ['ar', 'en', 'uz'] &&
+             data.darkMode is bool &&
+             data.autoScrollSpeed is number && data.autoScrollSpeed >= 0.2 && data.autoScrollSpeed <= 4.0 &&
+             data.selectedReciterId is string && data.selectedReciterId.size() >= 1 && data.selectedReciterId.size() <= 80 &&
+             data.playbackSpeed is number && data.playbackSpeed >= 0.5 && data.playbackSpeed <= 2.5 &&
+             data.prayerNotifications is bool &&
+             data.quranReminders is bool &&
+             data.revisionReminders is bool;
+    }
+
+    // 4. Progress Validation
+    function isValidUserProgress(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.lastPage is int && data.lastPage >= 1 && data.lastPage <= 604 &&
+             data.lastSurah is int && data.lastSurah >= 1 && data.lastSurah <= 114 &&
+             data.lastAyah is int && data.lastAyah >= 1 && data.lastAyah <= 286 &&
+             data.memorizedAyahsCount is int && data.memorizedAyahsCount >= 0 && data.memorizedAyahsCount <= 6236 &&
+             data.memorizedPagesCount is int && data.memorizedPagesCount >= 0 && data.memorizedPagesCount <= 604 &&
+             data.dailyGoalPages is int && data.dailyGoalPages >= 1 && data.dailyGoalPages <= 100 &&
+             data.dailyReadPages is int && data.dailyReadPages >= 0 && data.dailyReadPages <= 604 &&
+             data.completedRevisions is int && data.completedRevisions >= 0 && data.completedRevisions <= 100000;
+    }
+
+    // 5. Bookmarks Validation
+    function isValidBookmark(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.page is int && data.page >= 1 && data.page <= 604 &&
+             data.surah is int && data.surah >= 1 && data.surah <= 114 &&
+             data.ayah is int && data.ayah >= 1 && data.ayah <= 286 &&
+             data.favorite is bool &&
+             (!('note' in data) || (data.note is string && data.note.size() <= 500));
+    }
+
+    // 6. Reading History Validation
+    function isValidReadingHistory(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.page is int && data.page >= 1 && data.page <= 604 &&
+             data.surah is int && data.surah >= 1 && data.surah <= 114 &&
+             data.ayah is int && data.ayah >= 1 && data.ayah <= 286;
+    }
+
+    // 7. Memorization Session Validation
+    function isValidMemorizationSession(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.surah is int && data.surah >= 1 && data.surah <= 114 &&
+             data.startAyah is int && data.startAyah >= 1 && data.startAyah <= 286 &&
+             data.endAyah is int && data.endAyah >= data.startAyah && data.endAyah <= 286 &&
+             data.status in ['IN_PROGRESS', 'MEMORIZED', 'NEEDS_REVISION'] &&
+             data.memorized is bool &&
+             data.accuracyPercent is int && data.accuracyPercent >= 0 && data.accuracyPercent <= 100;
+    }
+
+    // 8. Revision Schedule Validation
+    function isValidRevisionSchedule(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.surah is int && data.surah >= 1 && data.surah <= 114 &&
+             data.startAyah is int && data.startAyah >= 1 && data.startAyah <= 286 &&
+             data.endAyah is int && data.endAyah >= data.startAyah && data.endAyah <= 286 &&
+             data.nextDueDateIso is string && data.nextDueDateIso.size() >= 4 && data.nextDueDateIso.size() <= 32 &&
+             data.intervalDays is int && data.intervalDays >= 1 && data.intervalDays <= 365 &&
+             data.completed is bool;
+    }
+
+    // 9. Recitation Recording Metadata Validation
+    function isValidRecordingMeta(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.surah is int && data.surah >= 1 && data.surah <= 114 &&
+             data.startAyah is int && data.startAyah >= 1 && data.startAyah <= 286 &&
+             data.endAyah is int && data.endAyah >= data.startAyah && data.endAyah <= 286 &&
+             data.durationMs is int && data.durationMs >= 0 && data.durationMs <= 3600000 &&
+             data.localFileName is string && data.localFileName.size() >= 1 && data.localFileName.size() <= 256 &&
+             data.speechMode in ['OFFLINE', 'ONLINE_DEVICE', 'RECORDED_ONLY'];
+    }
+
+    // 10. Recitation Assessment Validation
+    function isValidAssessment(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.surah is int && data.surah >= 1 && data.surah <= 114 &&
+             data.startAyah is int && data.startAyah >= 1 && data.startAyah <= 286 &&
+             data.endAyah is int && data.endAyah >= data.startAyah && data.endAyah <= 286 &&
+             data.recognizedText is string && data.recognizedText.size() <= 4000 &&
+             data.confidence is number && data.confidence >= 0.0 && data.confidence <= 1.0 &&
+             data.accuracyPercent is int && data.accuracyPercent >= 0 && data.accuracyPercent <= 100 &&
+             data.omittedCount is int && data.omittedCount >= 0 && data.omittedCount <= 1000 &&
+             data.repeatedCount is int && data.repeatedCount >= 0 && data.repeatedCount <= 1000 &&
+             data.replacedCount is int && data.replacedCount >= 0 && data.replacedCount <= 1000 &&
+             data.assessmentStatus in ['CONFIRMED', 'LOW_CONFIDENCE_REVIEW', 'UNPROCESSED'];
+    }
+
+    // 11. Memorization Test Result Validation
+    function isValidTestResult(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.testType in ['CONTINUE_AYAH', 'MISSING_WORDS', 'NEXT_AYAH', 'IDENTIFY_SURAH', 'CHOOSE_CONTINUATION', 'RECITE_BLIND'] &&
+             data.surah is int && data.surah >= 1 && data.surah <= 114 &&
+             data.startAyah is int && data.startAyah >= 1 && data.startAyah <= 286 &&
+             data.endAyah is int && data.endAyah >= data.startAyah && data.endAyah <= 286 &&
+             data.scorePercent is int && data.scorePercent >= 0 && data.scorePercent <= 100 &&
+             data.totalQuestions is int && data.totalQuestions >= 1 && data.totalQuestions <= 100 &&
+             data.correctAnswers is int && data.correctAnswers >= 0 && data.correctAnswers <= data.totalQuestions;
+    }
+
+    // 12. Khatmah Session Validation
+    function isValidKhatmah(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.targetDays is int && data.targetDays >= 1 && data.targetDays <= 365 &&
+             data.completedPages is int && data.completedPages >= 0 && data.completedPages <= 604 &&
+             data.lastPage is int && data.lastPage >= 1 && data.lastPage <= 604 &&
+             data.completed is bool;
+    }
+
+    // 13. Fasting Record Validation
+    function isValidFasting(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.planType in ['MON_THU', 'WHITE_DAYS', 'RAMADAN', 'CUSTOM'] &&
+             data.completedDays is int && data.completedDays >= 0 && data.completedDays <= 365 &&
+             data.targetDays is int && data.targetDays >= 1 && data.targetDays <= 365;
+    }
+
+    // 14. User Notification Validation
+    function isValidUserNotification(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 140 &&
+             data.body is string && data.body.size() >= 1 && data.body.size() <= 1000 &&
+             data.category in ['PRAYER', 'QURAN', 'MEMORIZATION', 'REVISION', 'SYSTEM'] &&
+             data.read is bool;
+    }
+
+    // 15. Announcement Validation
+    function isValidAnnouncement(data) {
+      return data.title is string && data.title.size() >= 1 && data.title.size() <= 160 &&
+             data.message is string && data.message.size() >= 1 && data.message.size() <= 2000 &&
+             data.audience in ['ALL', 'STUDENTS', 'MEMORIZERS'] &&
+             data.active is bool &&
+             data.createdBy is string && data.createdBy.size() >= 1 && data.createdBy.size() <= 128;
+    }
+
+    // 16. Approved Knowledge Source Validation
+    function isValidKnowledgeSource(data) {
+      return data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 60 &&
+             (!('question' in data) || (data.question is string && data.question.size() <= 500)) &&
+             data.answer is string && data.answer.size() >= 1 && data.answer.size() <= 8000 &&
+             (!('keywords' in data) || (data.keywords is string && data.keywords.size() <= 500)) &&
+             data.reference is string && data.reference.size() >= 1 && data.reference.size() <= 300 &&
+             data.approvalStatus in ['APPROVED', 'PENDING', 'REJECTED'] &&
+             data.createdBy is string && data.createdBy.size() >= 1 && data.createdBy.size() <= 128;
+    }
+
+    // 17. AI Feedback Validation
+    function isValidAiFeedback(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.question is string && data.question.size() >= 1 && data.question.size() <= 1000 &&
+             data.aiResponse is string && data.aiResponse.size() <= 8000 &&
+             data.helpful is bool &&
+             data.unanswered is bool &&
+             data.reviewed is bool;
+    }
+
+    // 18. Admin Audit Log Validation
+    function isValidAuditLog(data) {
+      return data.actorUid is string && data.actorUid.size() >= 1 && data.actorUid.size() <= 128 &&
+             data.actorEmail is string && data.actorEmail.size() >= 3 && data.actorEmail.size() <= 120 &&
+             data.action is string && data.action.size() >= 1 && data.action.size() <= 120 &&
+             data.target is string && data.target.size() <= 200 &&
+             data.details is string && data.details.size() <= 1000;
+    }
+
+    // Admin Registry Collection
+    match /admins/{adminUid} {
+      allow get: if isValidId(adminUid) && (isOwner(adminUid) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isValidId(adminUid) &&
+                       isAdmin() &&
+                       isValidAdminGrant(incoming()) &&
+                       incoming().uid == adminUid &&
+                       incoming().keys().hasAll(['uid', 'email', 'grantedBy', 'createdAt']) &&
+                       incoming().keys().hasOnly(['uid', 'email', 'grantedBy', 'createdAt']) &&
+                       isValidTimestamp(incoming().createdAt);
+      allow update: if false;
+      allow delete: if isValidId(adminUid) && isAdmin();
+    }
+
+    // User Profiles + Isolated User Subcollections
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+
+      allow create: if isValidId(userId) &&
+                       isOwner(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == request.auth.uid &&
+                       (incoming().role == 'STUDENT' || isAdmin()) &&
+                       incoming().accountStatus == 'ACTIVE' &&
+                       incoming().keys().hasAll(['userId', 'displayName', 'email', 'role', 'accountStatus', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'displayName', 'email', 'photoUrl', 'role', 'accountStatus', 'createdAt', 'updatedAt']) &&
+                       isValidTimestamp(incoming().createdAt) &&
+                       isValidTimestamp(incoming().updatedAt);
+
+      allow update: if isValidId(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidTimestamp(incoming().updatedAt) &&
+                       (
+                         (isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoUrl', 'role', 'accountStatus', 'updatedAt'])) ||
+                         (isOwner(userId) && incoming().role == existing().role && incoming().accountStatus == existing().accountStatus && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoUrl', 'updatedAt']))
+                       );
+
+      allow delete: if isValidId(userId) && (isOwner(userId) || isAdmin());
+
+      match /user_preferences/{prefId} {
+        allow get: if isValidId(prefId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(prefId) &&
+                         isOwner(userId) &&
+                         isValidUserPreferences(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'language', 'darkMode', 'autoScrollSpeed', 'selectedReciterId', 'playbackSpeed', 'prayerNotifications', 'quranReminders', 'revisionReminders', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'language', 'darkMode', 'autoScrollSpeed', 'selectedReciterId', 'playbackSpeed', 'prayerNotifications', 'quranReminders', 'revisionReminders', 'updatedAt']) &&
+                         isValidTimestamp(incoming().updatedAt);
+        allow update: if isValidId(prefId) &&
+                         isOwner(userId) &&
+                         isValidUserPreferences(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['language', 'darkMode', 'autoScrollSpeed', 'selectedReciterId', 'playbackSpeed', 'prayerNotifications', 'quranReminders', 'revisionReminders', 'updatedAt']);
+        allow delete: if isValidId(prefId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /user_progress/{progressId} {
+        allow get: if isValidId(progressId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(progressId) &&
+                         isOwner(userId) &&
+                         isValidUserProgress(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'lastPage', 'lastSurah', 'lastAyah', 'memorizedAyahsCount', 'memorizedPagesCount', 'dailyGoalPages', 'dailyReadPages', 'completedRevisions', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'lastPage', 'lastSurah', 'lastAyah', 'memorizedAyahsCount', 'memorizedPagesCount', 'dailyGoalPages', 'dailyReadPages', 'completedRevisions', 'updatedAt']) &&
+                         isValidTimestamp(incoming().updatedAt);
+        allow update: if isValidId(progressId) &&
+                         isOwner(userId) &&
+                         isValidUserProgress(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['lastPage', 'lastSurah', 'lastAyah', 'memorizedAyahsCount', 'memorizedPagesCount', 'dailyGoalPages', 'dailyReadPages', 'completedRevisions', 'updatedAt']);
+        allow delete: if isValidId(progressId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /bookmarks/{bookmarkId} {
+        allow get: if isValidId(bookmarkId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(bookmarkId) &&
+                         isOwner(userId) &&
+                         isValidBookmark(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'page', 'surah', 'ayah', 'favorite', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'page', 'surah', 'ayah', 'favorite', 'note', 'createdAt', 'updatedAt']) &&
+                         isValidTimestamp(incoming().createdAt) &&
+                         isValidTimestamp(incoming().updatedAt);
+        allow update: if isValidId(bookmarkId) &&
+                         isOwner(userId) &&
+                         isValidBookmark(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['favorite', 'note', 'updatedAt']);
+        allow delete: if isValidId(bookmarkId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /reading_history/{historyId} {
+        allow get: if isValidId(historyId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(historyId) &&
+                         isOwner(userId) &&
+                         isValidReadingHistory(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'page', 'surah', 'ayah', 'createdAt']) &&
+                         incoming().keys().hasOnly(['userId', 'page', 'surah', 'ayah', 'createdAt']) &&
+                         isValidTimestamp(incoming().createdAt);
+        allow update: if false;
+        allow delete: if isValidId(historyId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /memorization_sessions/{sessionId} {
+        allow get: if isValidId(sessionId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(sessionId) &&
+                         isOwner(userId) &&
+                         isValidMemorizationSession(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'surah', 'startAyah', 'endAyah', 'status', 'memorized', 'accuracyPercent', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'surah', 'startAyah', 'endAyah', 'status', 'memorized', 'accuracyPercent', 'createdAt', 'updatedAt']) &&
+                         isValidTimestamp(incoming().createdAt) &&
+                         isValidTimestamp(incoming().updatedAt);
+        allow update: if isValidId(sessionId) &&
+                         isOwner(userId) &&
+                         isValidMemorizationSession(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'memorized', 'accuracyPercent', 'updatedAt']);
+        allow delete: if isValidId(sessionId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /revision_schedules/{scheduleId} {
+        allow get: if isValidId(scheduleId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(scheduleId) &&
+                         isOwner(userId) &&
+                         isValidRevisionSchedule(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'surah', 'startAyah', 'endAyah', 'nextDueDateIso', 'intervalDays', 'completed', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'surah', 'startAyah', 'endAyah', 'nextDueDateIso', 'intervalDays', 'completed', 'createdAt', 'updatedAt']) &&
+                         isValidTimestamp(incoming().createdAt) &&
+                         isValidTimestamp(incoming().updatedAt);
+        allow update: if isValidId(scheduleId) &&
+                         isOwner(userId) &&
+                         isValidRevisionSchedule(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['nextDueDateIso', 'intervalDays', 'completed', 'updatedAt']);
+        allow delete: if isValidId(scheduleId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /recitation_recordings_metadata/{recId} {
+        allow get: if isValidId(recId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(recId) &&
+                         isOwner(userId) &&
+                         isValidRecordingMeta(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'surah', 'startAyah', 'endAyah', 'durationMs', 'localFileName', 'speechMode', 'createdAt']) &&
+                         incoming().keys().hasOnly(['userId', 'surah', 'startAyah', 'endAyah', 'durationMs', 'localFileName', 'speechMode', 'createdAt']) &&
+                         isValidTimestamp(incoming().createdAt);
+        allow update: if false;
+        allow delete: if isValidId(recId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /recitation_assessments/{assessmentId} {
+        allow get: if isValidId(assessmentId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(assessmentId) &&
+                         isOwner(userId) &&
+                         isValidAssessment(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'surah', 'startAyah', 'endAyah', 'recognizedText', 'confidence', 'accuracyPercent', 'omittedCount', 'repeatedCount', 'replacedCount', 'assessmentStatus', 'createdAt']) &&
+                         incoming().keys().hasOnly(['userId', 'surah', 'startAyah', 'endAyah', 'recognizedText', 'confidence', 'accuracyPercent', 'omittedCount', 'repeatedCount', 'replacedCount', 'assessmentStatus', 'createdAt']) &&
+                         isValidTimestamp(incoming().createdAt);
+        allow update: if false;
+        allow delete: if isValidId(assessmentId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /test_results/{testId} {
+        allow get: if isValidId(testId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(testId) &&
+                         isOwner(userId) &&
+                         isValidTestResult(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'testType', 'surah', 'startAyah', 'endAyah', 'scorePercent', 'totalQuestions', 'correctAnswers', 'createdAt']) &&
+                         incoming().keys().hasOnly(['userId', 'testType', 'surah', 'startAyah', 'endAyah', 'scorePercent', 'totalQuestions', 'correctAnswers', 'createdAt']) &&
+                         isValidTimestamp(incoming().createdAt);
+        allow update: if false;
+        allow delete: if isValidId(testId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /khatmah_sessions/{khatmahId} {
+        allow get: if isValidId(khatmahId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(khatmahId) &&
+                         isOwner(userId) &&
+                         isValidKhatmah(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'title', 'targetDays', 'completedPages', 'lastPage', 'completed', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'title', 'targetDays', 'completedPages', 'lastPage', 'completed', 'createdAt', 'updatedAt']) &&
+                         isValidTimestamp(incoming().createdAt) &&
+                         isValidTimestamp(incoming().updatedAt);
+        allow update: if isValidId(khatmahId) &&
+                         isOwner(userId) &&
+                         isValidKhatmah(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['completedPages', 'lastPage', 'completed', 'updatedAt']);
+        allow delete: if isValidId(khatmahId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /fasting_records/{fastId} {
+        allow get: if isValidId(fastId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(fastId) &&
+                         isOwner(userId) &&
+                         isValidFasting(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'title', 'planType', 'completedDays', 'targetDays', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'title', 'planType', 'completedDays', 'targetDays', 'createdAt', 'updatedAt']) &&
+                         isValidTimestamp(incoming().createdAt) &&
+                         isValidTimestamp(incoming().updatedAt);
+        allow update: if isValidId(fastId) &&
+                         isOwner(userId) &&
+                         isValidFasting(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTimestamp(incoming().updatedAt) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['completedDays', 'updatedAt']);
+        allow delete: if isValidId(fastId) && (isOwner(userId) || isAdmin());
+      }
+
+      match /notifications/{notifId} {
+        allow get: if isValidId(notifId) && (isOwner(userId) || isAdmin());
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isValidId(notifId) &&
+                         (isOwner(userId) || isAdmin()) &&
+                         isValidUserNotification(incoming()) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'title', 'body', 'category', 'read', 'createdAt']) &&
+                         incoming().keys().hasOnly(['userId', 'title', 'body', 'category', 'read', 'createdAt']) &&
+                         isValidTimestamp(incoming().createdAt);
+        allow update: if isValidId(notifId) &&
+                         (isOwner(userId) || isAdmin()) &&
+                         isValidUserNotification(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['read']);
+        allow delete: if isValidId(notifId) && (isOwner(userId) || isAdmin());
+      }
+    }
+
+    // Announcements (Signed-in users read; Admins manage)
+    match /announcements/{announcementId} {
+      allow get: if isValidId(announcementId) && isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isValidId(announcementId) &&
+                       isAdmin() &&
+                       isValidAnnouncement(incoming()) &&
+                       incoming().createdBy == request.auth.uid &&
+                       incoming().keys().hasAll(['title', 'message', 'audience', 'active', 'createdBy', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['title', 'message', 'audience', 'active', 'createdBy', 'createdAt', 'updatedAt']) &&
+                       isValidTimestamp(incoming().createdAt) &&
+                       isValidTimestamp(incoming().updatedAt);
+      allow update: if isValidId(announcementId) &&
+                       isAdmin() &&
+                       isValidAnnouncement(incoming()) &&
+                       incoming().createdBy == existing().createdBy &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidTimestamp(incoming().updatedAt) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['title', 'message', 'audience', 'active', 'updatedAt']);
+      allow delete: if isValidId(announcementId) && isAdmin();
+    }
+
+    // Approved Knowledge Sources for NOOR AI RAG (Signed-in users read; Admins manage)
+    match /approved_knowledge_sources/{sourceId} {
+      allow get: if isValidId(sourceId) && isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isValidId(sourceId) &&
+                       isAdmin() &&
+                       isValidKnowledgeSource(incoming()) &&
+                       incoming().createdBy == request.auth.uid &&
+                       incoming().keys().hasAll(['title', 'category', 'answer', 'reference', 'approvalStatus', 'createdBy', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['title', 'category', 'question', 'answer', 'keywords', 'reference', 'approvalStatus', 'createdBy', 'createdAt', 'updatedAt']) &&
+                       isValidTimestamp(incoming().createdAt) &&
+                       isValidTimestamp(incoming().updatedAt);
+      allow update: if isValidId(sourceId) &&
+                       isAdmin() &&
+                       isValidKnowledgeSource(incoming()) &&
+                       incoming().createdBy == existing().createdBy &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidTimestamp(incoming().updatedAt) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['title', 'category', 'question', 'answer', 'keywords', 'reference', 'approvalStatus', 'updatedAt']);
+      allow delete: if isValidId(sourceId) && isAdmin();
+    }
+
+    // AI Feedback & Unanswered Questions
+    match /ai_feedback/{feedbackId} {
+      allow get: if isValidId(feedbackId) && (isAdmin() || (isSignedIn() && existing().userId == request.auth.uid));
+      allow list: if isAdmin() || (isSignedIn() && existing().userId == request.auth.uid);
+      allow create: if isValidId(feedbackId) &&
+                       isSignedIn() &&
+                       isValidAiFeedback(incoming()) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().reviewed == false &&
+                       incoming().keys().hasAll(['userId', 'question', 'aiResponse', 'helpful', 'unanswered', 'reviewed', 'createdAt']) &&
+                       incoming().keys().hasOnly(['userId', 'question', 'aiResponse', 'helpful', 'unanswered', 'reviewed', 'createdAt']) &&
+                       isValidTimestamp(incoming().createdAt);
+      allow update: if isValidId(feedbackId) &&
+                       isAdmin() &&
+                       isValidAiFeedback(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['reviewed']);
+      allow delete: if isValidId(feedbackId) && isAdmin();
+    }
+
+    // Immutable Admin Audit Logs
+    match /admin_audit_logs/{logId} {
+      allow get: if isValidId(logId) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(logId) &&
+                       isAdmin() &&
+                       isValidAuditLog(incoming()) &&
+                       incoming().actorUid == request.auth.uid &&
+                       incoming().keys().hasAll(['actorUid', 'actorEmail', 'action', 'target', 'details', 'createdAt']) &&
+                       incoming().keys().hasOnly(['actorUid', 'actorEmail', 'action', 'target', 'details', 'createdAt']) &&
+                       isValidTimestamp(incoming().createdAt);
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

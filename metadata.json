@@ -1,0 +1,6 @@
+{
+  "name": "NOOR",
+  "description": "Offline-first Islamic application featuring Madinah Mushaf, interactive Ayah selection, single-stream Sheikh recitation follow-along, Arabic voice recitation assessment, prayer times and Adhan, Halaqat, local RAG AI assistant, and Super Admin Dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

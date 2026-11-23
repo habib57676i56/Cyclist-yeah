@@ -1,0 +1,1320 @@
+NOOR – COMPLETE MASTER PROJECT SPECIFICATION
+
+Advanced Islamic Application, Digital Quran, Memorization, Halaqat, Local AI Assistant & Super Admin Management System
+
+1. PROJECT VISION
+
+Develop NOOR into a complete, professional Islamic Android application combining Quran reading, memorization, recitation assessment, prayer times, Adhan, Islamic education, Halaqat management, and an intelligent AI assistant.
+
+The application must provide a reliable, beautiful, easy-to-use experience comparable to leading Android Quran applications.
+
+This is an expansion and repair of the existing NOOR project, not a new application.
+
+CRITICAL RULE: PRESERVE THE EXISTING APPLICATION
+
+- Do not rebuild the application from scratch.
+- Do not replace the existing technology stack unnecessarily.
+- Do not delete existing features, files, databases, or working components.
+- Do not redesign unrelated screens.
+- Inspect the existing project before changing anything.
+- Fix existing broken functionality before introducing new functionality.
+- Reuse existing components and services whenever possible.
+- Preserve existing user accounts, data, progress, and settings.
+- Create a backup before making significant changes.
+
+All new functionality must integrate into the existing NOOR architecture.
+
+---
+
+2. APPLICATION DESIGN AND USER EXPERIENCE
+
+Maintain NOOR's existing premium Liquid Glass design.
+
+Design requirements
+
+- Modern, elegant Android interface.
+- Dark Mode and Light Mode.
+- Correct text contrast in both themes.
+- Arabic and English language support.
+- Uzbek language support where already supported.
+- Complete Arabic RTL support.
+- Responsive phone and tablet layouts.
+- Smooth animations and transitions.
+- Professional icons rather than decorative emoji icons.
+- Consistent typography and spacing.
+- Accessible controls.
+- Fast navigation.
+- No unnecessary buttons or overcrowded screens.
+
+Night Mode correction
+
+Fix all text visibility problems without changing the existing background colors or visual identity.
+
+- Correct black text appearing on dark backgrounds.
+- Fix headings, descriptions, labels, placeholders, Quran text, dialogs, and menus.
+- Preserve existing backgrounds, gradients, cards, and buttons.
+- Ensure all text responds correctly to the active theme.
+
+Full-screen Quran reading
+
+When the user taps an empty area of the Mushaf screen:
+
+- Hide unnecessary navigation bars and reading controls.
+- Display only the Mushaf page.
+
+When the user taps again, restore the controls.
+
+Do not interrupt audio playback or recitation synchronization when entering or leaving full-screen mode.
+
+---
+
+3. COMPLETE DIGITAL QURAN AND MADINAH MUSHAF
+
+The Quran reader is one of the most important parts of NOOR.
+
+Authentic Mushaf pages
+
+Use a complete, verified, legally authorized collection of all 604 Madinah Mushaf pages, according to the intended Hafs narration and exact edition.
+
+The user explicitly prefers actual Mushaf page images rather than a completely recreated Quran layout.
+
+Requirements:
+
+- Authentic Uthmani Quran typography.
+- Original printed page arrangement.
+- Authentic Surah headings.
+- Original Ayah markers and decorative circles.
+- Original page proportions and borders.
+- High-quality images.
+- Offline page access after installation or importing resources.
+
+Do not use incomplete screenshots or randomly collected images.
+
+Verify the licensing and redistribution permissions of the selected Mushaf resources.
+
+Quran navigation
+
+Implement:
+
+- All 604 pages.
+- Surah index.
+- Juz index.
+- Hizb and quarter navigation where supported.
+- Page number navigation.
+- Search by Surah and Ayah.
+- Last reading position.
+- Bookmarks.
+- Favorites.
+- Continue reading.
+- Go to a specific Ayah.
+- Reading history.
+
+Preserve the exact mapping between page images, Surahs, Ayahs, and verified Quran text.
+
+---
+
+4. INTERACTIVE AYAH SELECTION
+
+The Mushaf images must not behave like static pictures.
+
+Every Ayah must have an accurate interactive region.
+
+Selection behavior
+
+- Single tap selects the correct Ayah.
+- Long press selects the exact Ayah.
+- No accidental selection of neighboring Ayahs.
+- Accurate selection across all 604 pages.
+- Correct Arabic RTL handling.
+- Correct selection after zooming and scrolling.
+- Support different Android screen sizes.
+
+Coordinate system
+
+Use verified page-coordinate metadata belonging to the exact Mushaf edition.
+
+Maintain accurate mappings between:
+
+- Page number.
+- Surah number.
+- Ayah number.
+- Ayah text.
+- Word positions.
+- Image coordinates.
+
+Do not use approximate touch regions or guessed coordinates.
+
+Preserve original Ayah number circles
+
+The original decorative Ayah number circles must remain exactly as they appear in the Mushaf image.
+
+Never:
+
+- Cover them with highlights.
+- Remove them.
+- Replace them.
+- Redraw them.
+- Distort their appearance.
+
+Highlight the actual Quran text without destroying the original Ayah markers.
+
+Selection appearance
+
+- Clean, transparent highlight.
+- No random lines.
+- No unwanted rectangular frames.
+- No inaccurate borders.
+- No permanent modification to the page image.
+
+Keep user-selected Ayah highlighting separate from live recitation highlighting.
+
+---
+
+5. AYAH CONTEXTUAL ACTION MENU
+
+When the user selects or long-presses an Ayah, display a clean contextual toolbar.
+
+Available actions:
+
+1. Play from this Ayah.
+2. Listen to this Ayah.
+3. Memorize this Ayah.
+4. Add to favorites.
+5. Tafsir.
+6. I'rab (إعراب).
+7. Sarf (صرف).
+8. Copy Ayah.
+9. Share Ayah.
+
+All actions must be functional.
+
+The selected Ayah must remain correctly identified while the menu is open.
+
+Tafsir
+
+Display reliable Tafsir information for the selected Ayah, including references where available.
+
+I'rab
+
+Provide grammatical analysis, including:
+
+- Grammatical position.
+- Subject and predicate.
+- Verbs and subjects.
+- Objects.
+- Prepositions.
+- Grammatical relationships.
+
+Sarf
+
+Provide morphological analysis, including:
+
+- Word root.
+- Morphological pattern.
+- Part of speech.
+- Verb form.
+- Relevant derivations.
+
+Never invent linguistic information or present unverified AI explanations as authoritative references.
+
+---
+
+6. QURAN AUDIO PLAYER AND RECITER SYSTEM
+
+Create a reliable Quran audio system supporting available Sheikh recitations.
+
+Reciter selection
+
+Use ONE main button:
+
+Choose Reciter
+
+When pressed, display a selection list containing the available reciters.
+
+Include properly licensed recordings where available, including:
+
+- Sheikh Nasser Al-Qatami.
+- Sheikh Maher Al-Muaiqly.
+- Other available reciters.
+
+The selected reciter must be clearly identified and saved.
+
+Do not display separate permanent buttons for every Sheikh.
+
+Audio controls
+
+- Play.
+- Pause.
+- Resume.
+- Stop.
+- Next Ayah.
+- Previous Ayah.
+- Repeat Ayah.
+- Repeat a selected range.
+- Playback speed where supported.
+- Select Surah.
+- Select starting Ayah.
+- Select reciter.
+
+Critical single-audio rule
+
+Only ONE active Sheikh audio stream may play at a time.
+
+Investigate and eliminate duplicate audio players and playback sessions.
+
+Starting playback from an Ayah must never also start another independent page-level player.
+
+Selecting another reciter must stop the previous playback before starting the new one.
+
+Repeated button presses must not create duplicate audio sessions.
+
+Audio synchronization and visual highlighting must never start another audio player.
+
+The user must hear exactly one Sheikh voice.
+
+Continuous audio playback
+
+The Sheikh must recite continuously from one Ayah to the next.
+
+Do not stop, pause, or restart the audio at every Ayah boundary.
+
+The visual highlighting system must operate independently from audio playback.
+
+---
+
+7. REAL-TIME SHEIKH RECITATION FOLLOW-ALONG
+
+This is a core feature.
+
+When a Sheikh's audio plays, NOOR must identify the currently recited Ayah and highlight it directly on the Mushaf page image.
+
+Required behavior
+
+1. Start Sheikh recitation.
+2. Identify the current Surah and Ayah.
+3. Highlight the exact Ayah text.
+4. When the Sheikh begins the next Ayah, move the highlight.
+5. Remove the previous highlight.
+6. Continue through the entire recitation.
+7. Automatically navigate to the correct Mushaf page.
+8. Preserve synchronization during pause and resume.
+
+Example:
+
+Ayah 1 → Ayah 2 → Ayah 3 → Ayah 4.
+
+The Sheikh's audio continues uninterrupted.
+
+Only the visual highlight changes.
+
+Technical requirements
+
+- Use verified Ayah audio timestamps.
+- Support continuous Surah audio.
+- Support separate Ayah audio files.
+- Use Quran-specific audio alignment when necessary.
+- Handle seeking and playback speed changes.
+- Handle repeated Ayahs.
+- Handle page transitions.
+- Never use arbitrary timers to guess the current Ayah.
+
+Word-level highlighting
+
+Where reliable word positions and audio timing metadata are available, highlight individual Quran words during recitation.
+
+Ayah-level synchronization must continue working even when word-level timing is unavailable.
+
+---
+
+8. MUSHAF TOUCH, SCROLLING AND ZOOM
+
+Repair the complete touch interaction system.
+
+Natural scrolling
+
+- Drag the Mushaf page upward and downward from anywhere on the page.
+- The page must follow the user's finger.
+- Do not require touching the edges.
+- Support smooth vertical scrolling.
+- Support horizontal navigation where appropriate.
+- Support pinch-to-zoom.
+- Maintain accurate coordinates after zooming.
+
+Gesture recognition
+
+Correctly distinguish:
+
+- Single tap.
+- Long press.
+- Vertical drag.
+- Horizontal swipe.
+- Pinch-to-zoom.
+
+Dragging must not accidentally select an Ayah.
+
+Scrolling must not interrupt audio.
+
+Zooming must not misplace the Ayah selection or highlight.
+
+Full-screen behavior
+
+A tap on an empty area hides the interface.
+
+A second tap restores the controls.
+
+Do not interrupt the Sheikh's audio or synchronization.
+
+---
+
+9. QURAN MEMORIZATION SYSTEM
+
+Create a complete, functional Quran memorization experience.
+
+Memorization features
+
+- Select Surah.
+- Select Ayah.
+- Select a range of Ayahs.
+- Daily memorization plans.
+- New memorization.
+- Previous memorization revision.
+- Complete Surah tests.
+- Random Ayah tests.
+- Memorization without displaying the Quran.
+- Continue from a selected Ayah.
+- Repeat selected Ayahs.
+- Daily revision schedules.
+- Memorization progress tracking.
+- Previous mistake revision.
+
+Memorization interface
+
+Keep the screen simple.
+
+Show the most important actions first.
+
+Move secondary options into organized menus rather than displaying too many buttons simultaneously.
+
+Preserve Tafsir, Mushaf, tests, and all existing memorization functionality.
+
+Do not delete features to simplify the interface.
+
+---
+
+10. REAL VOICE RECORDING AND QURAN RECITATION ASSESSMENT
+
+This is a critical system that must be repaired completely.
+
+Currently, recording and speech-to-text functionality have failed.
+
+Implement a real recording and recognition pipeline.
+
+A. Microphone recording
+
+- Request microphone permissions.
+- Verify microphone availability.
+- Start recording.
+- Pause and resume where supported.
+- Stop recording.
+- Display recording status.
+- Display recording duration.
+- Save audio files.
+- Play back recordings.
+- Delete or retry recordings.
+- Handle permission denial.
+- Handle interruptions.
+- Handle recording errors.
+
+Never display a recording indicator unless actual audio is being captured.
+
+B. Arabic speech-to-text
+
+When I recite the Quran, NOOR must listen to my voice and convert it into written Arabic text.
+
+Expected workflow:
+
+1. Select Surah and Ayah range.
+2. Press Start Recording.
+3. Recite the Quran.
+4. Capture the actual microphone audio.
+5. Process the recording.
+6. Convert the recitation into Arabic text.
+7. Display the recognized words in the application.
+8. Compare the recognized text against verified Quran text.
+9. Display possible mistakes.
+
+Use a suitable Arabic speech recognition engine, preferably specialized Quranic recognition.
+
+Support offline recognition where a suitable model is available.
+
+Do not require paid external APIs.
+
+Do not return an empty transcript silently.
+
+If recognition fails, explain why.
+
+C. Recitation assessment
+
+Detect possible:
+
+- Omitted words.
+- Added words.
+- Replaced words.
+- Repeated words.
+- Skipped Ayahs.
+- Incorrect verse order.
+- Long pauses.
+
+Display:
+
+- Correct words.
+- Words requiring review.
+- Suspected mistakes.
+- Current Surah.
+- Current Ayah.
+- Overall assessment.
+
+Distinguish between actual textual errors and speech-recognition uncertainty.
+
+Do not classify pronunciation differences as definite mistakes without reliable evidence.
+
+Allow teachers to review and approve assessments.
+
+D. Two separate audio modes
+
+Listen and Follow
+
+The application plays Sheikh audio and highlights the corresponding Ayahs.
+
+My Recitation and Memorization
+
+The application records the user's voice, converts it into Arabic text, compares it with the Quran, and evaluates the result.
+
+These modes must not interfere with each other.
+
+---
+
+11. AUTOMATIC QURAN SCROLLING
+
+Add automatic Mushaf scrolling.
+
+Requirements:
+
+- Start.
+- Pause.
+- Resume.
+- Stop.
+- Adjustable scrolling speed.
+- Smooth scrolling.
+- Automatic page continuation.
+- Preserve reading position.
+- Enable or disable at any time.
+
+Do not use arbitrary jumps.
+
+Keep automatic scrolling separate from the live Ayah synchronization system.
+
+---
+
+12. ADHAN AND PRAYER TIMES
+
+Implement a complete prayer times and Adhan system.
+
+Prayer times
+
+Display accurate daily prayer times:
+
+- Fajr.
+- Sunrise.
+- Dhuhr.
+- Asr.
+- Maghrib.
+- Isha.
+
+Support:
+
+- Automatic location-based calculation where permission is granted.
+- Manual city selection.
+- Calculation method selection.
+- Prayer time adjustments.
+- Notification preferences.
+- Next prayer countdown.
+
+Provide an option to select the appropriate calculation method.
+
+Adhan audio
+
+The default Adhan voice must be Sheikh Nasser Al-Qatami, provided a properly licensed recording is available.
+
+Allow users to:
+
+- Choose another Adhan recording.
+- Import their own audio.
+- Preview recordings.
+- Assign different recordings to different prayer times where supported.
+
+Supported formats:
+
+- MP3.
+- M4A.
+- WAV.
+
+Save audio preferences permanently.
+
+Provide a default fallback recording if a custom file becomes unavailable.
+
+Adhan notifications
+
+- Notify at the correct prayer time.
+- Play the selected Adhan where Android permissions and device settings allow.
+- Handle background restrictions.
+- Handle notification permissions.
+- Handle audio focus.
+- Avoid duplicate Adhan playback.
+- Allow individual prayer notifications to be enabled or disabled.
+
+Never claim an Adhan plays successfully if Android has blocked its playback.
+
+---
+
+13. ANDROID NOTIFICATION SHADE, LOCK SCREEN AND HOME SCREEN SHORTCUTS
+
+Provide useful controls outside the application.
+
+Android media controls
+
+When Quran audio is playing, display standard Android media controls in the notification shade and lock screen.
+
+Include:
+
+- Play/Pause.
+- Next.
+- Previous.
+- Current reciter.
+- Current Surah and Ayah where supported.
+
+When Quran audio is not playing, display relevant upcoming prayer information through appropriate notifications.
+
+Do not keep unnecessary persistent notifications running.
+
+Home screen shortcuts
+
+Provide useful Android shortcuts for:
+
+- Open Quran.
+- Continue reading.
+- Start memorization.
+- Prayer times.
+- Quran listening.
+
+Use standard Android shortcut mechanisms.
+
+---
+
+14. KHATMAH AND FASTING SYSTEM
+
+Implement complete personal worship tracking.
+
+Quran Khatmah
+
+- Create a new Khatmah.
+- Choose the target completion period.
+- Calculate daily reading portions.
+- Display daily progress.
+- Mark daily portions completed.
+- Track completed pages and Juz.
+- Display remaining portions.
+- Send reminders.
+- Preserve historical Khatmahs.
+
+Fasting tracker
+
+- Create fasting plans.
+- Track completed fasting days.
+- Display progress.
+- Add reminders.
+- Manage optional fasting schedules.
+
+Critical navigation fix
+
+There is a current bug where completing a task or daily reading portion causes the application to exit unexpectedly.
+
+Fix this behavior.
+
+When the user marks a task or daily portion as completed:
+
+- Save the completion status.
+- Update progress.
+- Display a confirmation.
+- Remain inside the current section.
+- Do not close the application.
+- Do not unexpectedly navigate away.
+- Preserve the user's position.
+
+---
+
+15. NOOR EDUCATIONAL LIBRARY
+
+Create a structured Islamic educational library.
+
+Include:
+
+- Quran lessons.
+- Tafsir resources.
+- Hadith education.
+- Islamic studies.
+- Arabic language.
+- Tajweed lessons.
+- Memorization guidance.
+- Revision techniques.
+- Educational articles.
+- Downloadable learning resources.
+
+Content must be manageable through the Admin Dashboard.
+
+Use reliable references and distinguish verified material from general educational explanations.
+
+---
+
+16. HALAQAT MANAGEMENT SYSTEM
+
+Create a complete Quran memorization Halaqat system.
+
+Group management
+
+- Create Halaqat.
+- Edit groups.
+- Delete groups with appropriate authorization.
+- Assign teachers.
+- Add students.
+- Remove students.
+- Set schedules.
+- Set memorization targets.
+- Set revision plans.
+- Track attendance.
+- Track student progress.
+
+Teacher functionality
+
+- View assigned groups.
+- View students.
+- Record daily memorization.
+- Review recitations.
+- Evaluate student performance.
+- Add teacher notes.
+- Track attendance.
+- Assign revision tasks.
+
+Student functionality
+
+- View assigned Halaqat.
+- View teacher information.
+- View schedules.
+- View memorization assignments.
+- Submit recitations.
+- View grades.
+- View progress.
+- View announcements.
+
+Group communication
+
+Provide appropriate group announcements and communication features with access permissions.
+
+Performance tracking
+
+- Weekly ranking.
+- Student progress.
+- Attendance reports.
+- Memorization completion.
+- Revision consistency.
+- Assessment history.
+
+---
+
+17. STUDENT AND TEACHER MANAGEMENT
+
+Support complete education administration.
+
+Student management
+
+- Registration.
+- Student profiles.
+- Account management.
+- Group assignments.
+- Attendance.
+- Memorization progress.
+- Grades.
+- Recitation recordings where authorized.
+- Assessment history.
+- Individual reports.
+
+Teacher management
+
+- Teacher registration.
+- Profiles.
+- Group assignments.
+- Permissions.
+- Activity tracking.
+- Student assessment review.
+- Memorization plan management.
+
+Reports
+
+Generate reports for:
+
+- Individual students.
+- Teachers.
+- Halaqat.
+- Attendance.
+- Grades.
+- Memorization progress.
+- Revision history.
+
+Support export to TXT, CSV, and PDF where technically supported.
+
+---
+
+18. NOOR AI – LOCAL ADMIN-TRAINABLE INTELLIGENCE
+
+Build NOOR AI as an expandable educational assistant.
+
+The AI must not be limited to fixed predefined questions and answers.
+
+I want to teach and manage its knowledge through the application's Super Admin Dashboard.
+
+Core requirements
+
+- Understand Arabic questions.
+- Support common Arabic expressions.
+- Answer in clear Arabic.
+- Explain Islamic educational topics.
+- Help students memorize Quran.
+- Help with revision.
+- Explain lessons.
+- Search administrator-approved knowledge.
+- Provide references when available.
+- Admit uncertainty.
+- Never invent Quranic verses or Hadith.
+- Avoid unsupported religious rulings.
+
+Admin-controlled knowledge management
+
+Allow the administrator to:
+
+- Add questions and answers.
+- Add educational content.
+- Edit information.
+- Delete incorrect information.
+- Organize categories.
+- Add keywords.
+- Import TXT.
+- Import JSON.
+- Import supported PDF.
+- Import DOCX.
+- Add Islamic educational references.
+- Approve or reject submitted content.
+- Rebuild the search index.
+- Export and back up the knowledge database.
+
+Learning architecture
+
+Use a local searchable knowledge database and Retrieval-Augmented Generation (RAG).
+
+When new information is added:
+
+1. Extract its content.
+2. Organize it.
+3. Split large documents into searchable sections.
+4. Index it.
+5. Make approved information available to NOOR AI.
+6. Retrieve relevant information when answering questions.
+
+Clearly distinguish knowledge-base updates from actual model training or fine-tuning.
+
+Do not falsely claim that importing a document retrains the AI model.
+
+Local AI requirements
+
+- No mandatory OpenAI API.
+- No mandatory external AI API.
+- No paid AI subscription.
+- No mandatory cloud service.
+- Use local search and retrieval.
+- Support a lightweight local language model only if device resources permit.
+- Allow model resources to be imported when needed.
+- Keep the application functional even if a local generative model is unavailable.
+
+The administrator must be able to expand NOOR AI's knowledge without changing source code.
+
+---
+
+19. ADVANCED SUPER ADMIN DASHBOARD
+
+Create a powerful, secure administration system accessible through the existing Super Admin entry in the application.
+
+The administrator must have comprehensive control over NOOR.
+
+Do not make a decorative dashboard with fake statistics or inactive buttons.
+
+A. Dashboard overview
+
+Display actual information:
+
+- Total students.
+- Total teachers.
+- Total Halaqat.
+- Active students.
+- Completed memorization sessions.
+- Pending assessments.
+- AI knowledge entries.
+- Imported documents.
+- Recent administrative activity.
+- Storage usage.
+- Recording system status.
+- AI processing status.
+
+B. Student control
+
+Manage student accounts, groups, attendance, progress, assessments, and reports.
+
+C. Teacher control
+
+Manage teachers, permissions, assignments, and activities.
+
+D. Halaqat control
+
+Create, edit, organize, and manage all Quran memorization groups.
+
+E. AI control
+
+Manage:
+
+- Knowledge database.
+- Imported documents.
+- Questions and answers.
+- Categories.
+- References.
+- Search index.
+- AI settings.
+- Model resources.
+- Knowledge backup.
+- Approval workflow.
+
+F. Quran content control
+
+Manage:
+
+- Quran learning resources.
+- Educational content.
+- Tafsir resources.
+- Memorization plans.
+- Tests.
+- Reciters.
+- Audio resources.
+- Help information.
+
+G. Adhan and prayer control
+
+Manage:
+
+- Prayer calculation settings.
+- Default Adhan recording.
+- Available Adhan voices.
+- Notification behavior.
+- Audio resources.
+- Prayer-related settings.
+
+H. Application feature control
+
+Allow authorized administrators to enable or disable optional features.
+
+I. Roles and permissions
+
+Implement:
+
+- Super Administrator.
+- Administrator.
+- Quran Teacher.
+- Student.
+
+Each role must have clearly defined permissions.
+
+Only authorized administrators may change application-wide settings or access sensitive student data.
+
+---
+
+20. ADMIN ANNOUNCEMENTS, MESSAGES AND NOTIFICATIONS
+
+Allow the Super Admin to communicate with application users.
+
+Admin messaging
+
+The administrator must be able to:
+
+- Send messages to all users.
+- Send messages to students only.
+- Send messages to teachers only.
+- Send messages to selected Halaqat.
+- Send individual messages where authorized.
+- Create announcements.
+- Schedule announcements where supported.
+- Edit or delete announcements.
+- View delivery status where available.
+
+Notification types
+
+- General announcements.
+- Quran learning reminders.
+- Memorization reminders.
+- New lessons.
+- Halaqat announcements.
+- Important administrative messages.
+
+Use appropriate Android notification channels.
+
+Do not send duplicate notifications.
+
+Advertisement cards
+
+Add manageable announcement and promotional cards inside the application.
+
+The administrator must be able to:
+
+- Create cards.
+- Edit cards.
+- Upload images.
+- Add titles and descriptions.
+- Add internal links.
+- Set visibility.
+- Set display order.
+- Activate or deactivate cards.
+
+These must be administrator-managed application cards, not mandatory third-party advertising networks.
+
+---
+
+21. ADVANCED ADMIN SETTINGS
+
+Provide a dedicated settings area for Super Admin.
+
+Include controls for:
+
+- Application configuration.
+- Quran reader.
+- Mushaf resources.
+- Quran audio.
+- Reciters.
+- Adhan.
+- Prayer times.
+- Recording.
+- Speech recognition.
+- Memorization assessment.
+- AI knowledge.
+- AI model resources.
+- Halaqat.
+- Students.
+- Teachers.
+- Notifications.
+- Announcement cards.
+- Storage.
+- Backup and restoration.
+- Languages.
+- Feature activation.
+- Diagnostic information.
+
+All controls must be connected to actual application functionality.
+
+---
+
+22. OFFLINE-FIRST ARCHITECTURE AND SYRIA COMPATIBILITY
+
+This is a strict project requirement.
+
+NOOR must be designed to work without depending on complex cloud infrastructure.
+
+Core offline functionality
+
+Support offline use of:
+
+- Quran text.
+- Mushaf page images after resources are installed.
+- Quran navigation.
+- Local reading progress.
+- Bookmarks.
+- Memorization progress.
+- Audio resources that have been downloaded.
+- Local recording.
+- Local speech recognition where suitable models are installed.
+- Local AI knowledge search.
+- Local administration.
+- Educational content already stored locally.
+
+Restrictions
+
+Do not introduce mandatory:
+
+- Paid APIs.
+- Paid AI services.
+- Cloud databases.
+- Paid hosting.
+- Firebase dependencies for core functionality.
+- External accounts required for basic application use.
+- Online-only Quran reading.
+
+The application must remain useful without an internet connection.
+
+Local data management
+
+Use a suitable local database.
+
+Provide:
+
+- Local backups.
+- Database export.
+- Database restoration.
+- Resource import.
+- Storage management.
+
+Clearly distinguish local administration from remote multi-device administration.
+
+Remote synchronization must not be claimed unless a real synchronization system exists.
+
+---
+
+23. GITHUB AND ANDROID APK BUILD REQUIREMENTS
+
+The application must remain straightforward to build and distribute.
+
+GitHub integration
+
+Prepare the project so it can be built through GitHub Actions.
+
+Requirements:
+
+- Preserve the existing technology stack.
+- Provide a working build configuration.
+- Generate a real Android APK.
+- Include required Android permissions.
+- Include necessary application resources.
+- Keep secrets out of source code.
+- Avoid unnecessary complicated infrastructure.
+
+The user should be able to download the generated APK from GitHub Actions artifacts.
+
+Provide a clear build report.
+
+Do not claim that the APK is ready unless the build succeeds.
+
+---
+
+24. SECURITY, PRIVACY AND DATA PROTECTION
+
+- Secure administrator authentication.
+- Never store passwords in plain text.
+- Apply permission checks to administrative operations.
+- Protect student information.
+- Protect recordings.
+- Validate imported files.
+- Restrict sensitive information to authorized users.
+- Record important administrative actions.
+- Provide secure backup and restoration.
+- Request microphone and location permissions only when needed.
+- Do not upload audio without explicit consent.
+- Prefer local processing.
+
+---
+
+25. TECHNICAL PERFORMANCE
+
+Optimize NOOR for ordinary Android devices.
+
+- Fast application startup.
+- Smooth Mushaf page navigation.
+- Efficient image loading.
+- Low memory usage.
+- Low battery consumption.
+- Reliable audio playback.
+- Reliable background notifications.
+- No duplicate audio sessions.
+- No unnecessary services.
+- No application crashes.
+- No blocking operations on the main UI thread.
+
+Load large Mushaf resources efficiently rather than keeping all images in memory.
+
+---
+
+26. STRICT DEVELOPMENT WORKFLOW
+
+Before making changes:
+
+1. Inspect the entire existing project.
+2. Identify the current technology stack.
+3. Inspect all Quran-related components.
+4. Inspect audio playback and recording services.
+5. Inspect microphone permissions.
+6. Inspect speech recognition.
+7. Inspect memorization logic.
+8. Inspect database structures.
+9. Inspect AI functionality.
+10. Inspect Admin Dashboard.
+11. Identify the actual causes of existing failures.
+12. Create a backup.
+13. Plan the smallest safe set of changes.
+
+Do not make broad, unnecessary modifications.
+
+Implement changes in controlled stages.
+
+After each stage, test the affected functionality before continuing.
+
+---
+
+27. MANDATORY FUNCTIONAL TESTING
+
+The application must be tested for actual functionality, not merely visual appearance.
+
+Quran tests
+
+- Verify all page images.
+- Verify Surah and Ayah mappings.
+- Verify long-press selection.
+- Verify single-tap selection.
+- Verify original Ayah number circles.
+- Verify zoom and scrolling.
+- Verify contextual actions.
+- Verify page navigation.
+
+Audio tests
+
+- Verify exactly one Sheikh voice.
+- Verify no duplicate playback.
+- Verify continuous audio.
+- Verify selected-Ayah playback.
+- Verify pause and resume.
+- Verify Ayah synchronization.
+- Verify page transitions.
+- Verify repeated Ayahs.
+
+Recording and memorization tests
+
+- Verify microphone permissions.
+- Record real voice.
+- Save actual audio.
+- Play recorded audio.
+- Convert real recitation into Arabic text.
+- Compare recognized text against verified Quran text.
+- Test omitted and repeated words.
+- Verify uncertainty handling.
+- Save assessment results.
+
+AI tests
+
+- Import a TXT file.
+- Import a JSON file.
+- Import a supported PDF.
+- Index new knowledge.
+- Ask a question related to imported content.
+- Verify that the answer uses the new information.
+- Verify that unsupported answers are not fabricated.
+
+Administration tests
+
+- Create students.
+- Create teachers.
+- Create Halaqat.
+- Assign students.
+- Manage permissions.
+- Send announcements.
+- Create advertisement cards.
+- Manage AI knowledge.
+- Export reports.
+- Back up and restore data.
+
+Offline tests
+
+- Disable internet access.
+- Open the Quran.
+- Navigate Mushaf pages.
+- Access locally available audio.
+- Record locally.
+- Use local search.
+- Open administration.
+- Verify stored progress.
+
+---
+
+28. FINAL DELIVERY AND HONEST IMPLEMENTATION REPORT
+
+At the end of the development, provide a detailed report containing:
+
+1. Existing problems discovered.
+2. Root causes.
+3. Files created.
+4. Files modified.
+5. Features repaired.
+6. Features implemented.
+7. Features successfully tested.
+8. Features that failed testing.
+9. Features requiring additional resources.
+10. Features that require internet access.
+11. Features that work offline.
+12. Any remaining limitations.
+13. Successful APK build status.
+
+Do not claim that a feature is complete if it has only been implemented visually.
+
+Do not provide fake AI responses, fake recording results, simulated synchronization, or nonfunctional buttons.
+
+If a required feature needs a special recognition model, coordinate dataset, licensed audio recording, or additional resource, clearly identify the dependency and explain how it can be installed or imported.
+
+---
+
+FINAL PROJECT OBJECTIVE
+
+Transform NOOR into a complete, reliable, professional Islamic Android application that combines:
+
+- Authentic 604-page Madinah Mushaf.
+- Accurate interactive Ayah selection.
+- Tafsir, I'rab and Sarf.
+- Continuous Sheikh Quran recitation.
+- Single-player audio architecture.
+- Live Ayah highlighting.
+- Automatic Mushaf page synchronization.
+- Quran auto-scrolling.
+- Real microphone recording.
+- Arabic speech-to-text.
+- Quran recitation comparison.
+- Memorization and revision.
+- Adhan with Sheikh Nasser Al-Qatami as the default where licensed audio is available.
+- Custom Adhan recordings.
+- Accurate prayer times.
+- Android notification and media controls.
+- Home screen shortcuts.
+- Quran Khatmah tracking.
+- Fasting tracking.
+- Islamic educational library.
+- Quran Halaqat.
+- Student and teacher management.
+- Grades, attendance and rankings.
+- Local trainable NOOR AI.
+- Advanced Super Admin Dashboard.
+- Admin messaging and notifications.
+- Announcement and promotional cards.
+- Offline-first operation.
+- GitHub-based Android APK generation.
+
+ABSOLUTE PRIORITIES
+
+1. Preserve the existing application.
+2. Repair broken features before adding new ones.
+3. Make Quran selection accurate.
+4. Guarantee exactly one active audio stream.
+5. Make Sheikh recitation continuous with accurate Ayah highlighting.
+6. Make microphone recording and Arabic transcription actually work.
+7. Make Quran memorization and assessment functional.
+8. Build an AI knowledge system controlled by Super Admin without mandatory external APIs.
+9. Provide complete administration of Halaqat, students, teachers and application content.
+10. Keep the application practical, lightweight, offline-first and compatible with the user's Android environment.
+
+FINAL RULE: A working feature is more important than a beautiful mockup. Do not report success without real implementation and testing. Preserve everything that already works, repair what is broken, and deliver a functional NOOR Android APK.
