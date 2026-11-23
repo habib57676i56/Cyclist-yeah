@@ -43,8 +43,12 @@ jobs:
         with:
           gradle-version: '9.3.1'
 
-      - name: Run unit, Robolectric UI tests, and build Debug APK
-        run: gradle :app:testDebugUnitTest :app:assembleDebug --no-daemon --stacktrace
+      - name: Build Debug APK
+        id: build_apk
+        run: gradle :app:assembleDebug --no-daemon --console=plain --max-workers=2 -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
+
+      - name: Run unit and Robolectric UI tests
+        run: gradle :app:testDebugUnitTest --no-daemon --console=plain --max-workers=2 -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
       - name: Upload Unit Test Report on Failure
         if: failure()
@@ -54,6 +58,7 @@ jobs:
           path: app/build/reports/tests/testDebugUnitTest/
 
       - name: Upload NOOR Android APK Artifact
+        if: steps.build_apk.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: noor-debug-apk
